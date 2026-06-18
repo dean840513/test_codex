@@ -1,8 +1,11 @@
-import { json, normalizeProduct, missingDbResponse, requireDb } from './_shared.js';
+import { errorJson, json, normalizeProduct, requireDb } from './_shared.js';
 
 export async function onRequestGet({ env }) {
-  const db = requireDb(env);
-  if (!db) return missingDbResponse();
-  const { results } = await db.prepare('SELECT * FROM products ORDER BY id').all();
-  return json({ products: results.map(normalizeProduct) });
+  try {
+    const db = requireDb(env);
+    const { results } = await db.prepare('SELECT * FROM products ORDER BY id').all();
+    return json({ products: results.map(normalizeProduct) });
+  } catch (error) {
+    return errorJson(error);
+  }
 }

@@ -1,14 +1,33 @@
-# Cloudflare Pages + Pages Functions + D1 测试商城
+# Cloudflare Pages + Pages Functions + D1 多页面测试商城
 
-这是一个无外部服务器的测试酒类商城：静态页面由 Cloudflare Pages 托管，接口由 Pages Functions 提供，数据持久化到 Cloudflare D1。
+这是一个无外部服务器的测试酒类商城：静态页面由 Cloudflare Pages 托管，接口由 Pages Functions 提供，数据持久化到 Cloudflare D1，支付页为模拟 Stripe 风格表单。
 
-## 功能
+## 页面结构
 
-- 商品列表与商品详情
-- 模拟登录（固定测试用户 `demo@example.com`）
-- 模拟下单并扣减商品库存
-- 购买后自动加入“我的酒窖”
-- 从酒窖中选择藏品并转售上架
+- `/index.html`：首页 / 商品列表
+- `/product.html?id=xxx`：商品详情页
+- `/checkout.html?productId=xxx&qty=1`：购买确认页
+- `/payment.html?orderId=xxx`：模拟 Stripe 付款页
+- `/orders.html`：我的订单页
+- `/cellar.html`：我的酒窖页
+- `/resale.html`：二手商品列表页
+- `/resell.html?productId=xxx`：上架转售页面
+
+所有页面顶部都有统一导航：Home、My Orders、My Cellar、Resale Market。
+
+## API
+
+- `GET /api/products`
+- `GET /api/product?id=xxx`
+- `POST /api/orders/create`：创建 `pending` 订单，不扣库存
+- `POST /api/orders/pay`：模拟支付成功，将订单改为 `paid`，扣减库存并写入 `cellar_items`
+- `GET /api/orders`
+- `GET /api/cellar`
+- `GET /api/resales`
+- `POST /api/resales/create`
+- `POST /api/resales/buy`
+
+所有 API 都返回 JSON。若 D1 binding 缺失或参数错误，Pages Functions 会返回清晰的 JSON 错误信息。
 
 ## 本地运行
 
@@ -19,7 +38,6 @@ npm run dev
 ```
 
 打开 Wrangler 输出的本地地址即可体验商城。
-
 
 ## Cloudflare Pages 构建设置
 
@@ -38,7 +56,7 @@ npm run dev
 
 ## 常见部署问题
 
-如果页面弹出 `Unexpected token '<', "<!DOCTYPE" ... is not valid JSON`，通常表示浏览器请求 `/api/*` 时拿到了 HTML 页面而不是 Pages Functions 返回的 JSON。请检查：
+如果页面提示接口没有返回 JSON，通常表示浏览器请求 `/api/*` 时拿到了 HTML 页面而不是 Pages Functions 返回的 JSON。请检查：
 
 1. 已重新部署包含 `public/_routes.json` 的版本，确保 `/api/*` 请求被路由到 Pages Functions。
 2. Cloudflare Pages 项目已在 Settings > Functions > D1 database bindings 中绑定 D1，binding 名称必须是 `DB`。

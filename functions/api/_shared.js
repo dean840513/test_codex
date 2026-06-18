@@ -8,6 +8,11 @@ export function json(data, init = {}) {
   });
 }
 
+export function errorJson(error, status = 500) {
+  const message = error instanceof Error ? error.message : String(error || '请求失败');
+  return json({ error: message }, { status });
+}
+
 export async function readJson(request) {
   try {
     return await request.json();
@@ -18,15 +23,9 @@ export async function readJson(request) {
 
 export function requireDb(env) {
   if (!env.DB) {
-    return null;
+    throw new Error('D1 数据库未绑定。请在 Cloudflare Pages 项目 Settings > Functions > D1 database bindings 中添加 binding 名称 DB。');
   }
   return env.DB;
-}
-
-export function missingDbResponse() {
-  return json({
-    error: 'D1 数据库未绑定。请在 Cloudflare Pages 项目 Settings > Functions > D1 database bindings 中添加 binding 名称 DB。',
-  }, { status: 500 });
 }
 
 export function centsToYuan(cents) {
@@ -56,4 +55,12 @@ export async function getDemoUser(db) {
     user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(result.meta.last_row_id).first();
   }
   return user;
+}
+
+export function assertPositiveInteger(value, label) {
+  const number = Number(value);
+  if (!Number.isInteger(number) || number < 1) {
+    throw new Error(`${label} 必须是正整数`);
+  }
+  return number;
 }
