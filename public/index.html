@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cloudflare D1 测试酒类商城</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Cloudflare Pages + Functions + D1</p>
+        <h1>测试酒类商城</h1>
+        <p>商品浏览、模拟登录、下单扣库存、我的酒窖与转售上架都运行在 Cloudflare Pages Functions 上。</p>
+      </div>
+      <button id="loginBtn">模拟登录</button>
+    </header>
+
+    <main>
+      <section>
+        <div class="section-title">
+          <h2>商品列表</h2>
+          <span id="userBadge">未登录</span>
+        </div>
+        <div id="products" class="grid"></div>
+      </section>
+
+      <aside id="detail" class="panel">
+        <h2>商品详情</h2>
+        <p>请选择一个商品查看详情。</p>
+      </aside>
+
+      <section class="panel">
+        <div class="section-title">
+          <h2>我的酒窖</h2>
+          <button id="refreshCellar">刷新</button>
+        </div>
+        <div id="cellar"></div>
+      </section>
+    </main>
+
+    <template id="productCard">
+      <article class="card">
+        <img alt="" />
+        <div class="card-body">
+          <h3></h3>
+          <p class="muted"></p>
+          <strong></strong>
+          <p class="stock"></p>
+          <div class="actions">
+            <button class="detailBtn">详情</button>
+            <button class="buyBtn primary">模拟下单</button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
