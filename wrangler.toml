@@ -5,5 +5,5 @@ compatibility_date = "2026-06-18"
 [[d1_databases]]
 binding = "DB"
 database_name = "shop-db"
-database_id = "replace-with-your-d1-database-id"
+database_id = "b6b36a3a-f252-4fa6-bdfe-a4a7f1b208c5"
 migrations_dir = "migrations"
