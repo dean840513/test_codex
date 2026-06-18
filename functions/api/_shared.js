@@ -18,9 +18,15 @@ export async function readJson(request) {
 
 export function requireDb(env) {
   if (!env.DB) {
-    throw new Error('D1 binding DB is not configured.');
+    return null;
   }
   return env.DB;
+}
+
+export function missingDbResponse() {
+  return json({
+    error: 'D1 数据库未绑定。请在 Cloudflare Pages 项目 Settings > Functions > D1 database bindings 中添加 binding 名称 DB。',
+  }, { status: 500 });
 }
 
 export function centsToYuan(cents) {

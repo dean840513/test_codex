@@ -5,6 +5,8 @@ import { readFile } from 'node:fs/promises';
 const migration = await readFile('migrations/0001_initial.sql', 'utf8');
 const app = await readFile('public/app.js', 'utf8');
 const orderFunction = await readFile('functions/api/order.js', 'utf8');
+const routes = await readFile('public/_routes.json', 'utf8');
+const shared = await readFile('functions/api/_shared.js', 'utf8');
 
 test('D1 schema contains commerce tables and seed products', () => {
   for (const table of ['users', 'products', 'orders', 'order_items', 'cellar_items', 'resale_listings']) {
@@ -23,4 +25,14 @@ test('order flow decrements stock before adding cellar items', () => {
   assert.match(orderFunction, /UPDATE products SET stock = stock - \?/);
   assert.match(orderFunction, /INSERT INTO cellar_items/);
   assert.match(orderFunction, /ON CONFLICT\(user_id, product_id\)/);
+});
+
+
+test('Pages routes explicitly send API traffic to Functions', () => {
+  assert.match(routes, /"\/api\/\*"/);
+});
+
+test('frontend and functions expose JSON diagnostics for deployment misconfiguration', () => {
+  assert.match(app, /没有返回 JSON/);
+  assert.match(shared, /D1 数据库未绑定/);
 });

@@ -36,6 +36,15 @@ npm run dev
 
 `npm run build` 只校验 `public` 输出目录是否存在，因为本项目是原生静态页面，不需要打包步骤。
 
+## 常见部署问题
+
+如果页面弹出 `Unexpected token '<', "<!DOCTYPE" ... is not valid JSON`，通常表示浏览器请求 `/api/*` 时拿到了 HTML 页面而不是 Pages Functions 返回的 JSON。请检查：
+
+1. 已重新部署包含 `public/_routes.json` 的版本，确保 `/api/*` 请求被路由到 Pages Functions。
+2. Cloudflare Pages 项目已在 Settings > Functions > D1 database bindings 中绑定 D1，binding 名称必须是 `DB`。
+3. 已执行 `npm run db:migrate:remote` 初始化远端 D1 表结构和种子数据。
+4. Deploy command 没有使用 `npx wrangler deploy`。
+
 ## 部署到 Cloudflare Pages
 
 1. 创建 D1 数据库：

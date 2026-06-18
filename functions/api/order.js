@@ -1,7 +1,8 @@
-import { getDemoUser, json, readJson, requireDb } from './_shared.js';
+import { getDemoUser, json, readJson, missingDbResponse, requireDb } from './_shared.js';
 
 export async function onRequestPost({ env, request }) {
   const db = requireDb(env);
+  if (!db) return missingDbResponse();
   const body = await readJson(request);
   const productId = Number(body.productId);
   const quantity = Math.max(1, Number(body.quantity || 1));

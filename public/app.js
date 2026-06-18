@@ -2,9 +2,20 @@ const state = { user: null, products: [] };
 const money = (cents) => `¥${(cents / 100).toFixed(2)}`;
 const api = async (url, options) => {
   const response = await fetch(url, options);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.error || '请求失败');
-  return data;
+  const contentType = response.headers.get('content-type') || '';
+  const payload = contentType.includes('application/json')
+    ? await response.json()
+    : { error: await response.text() };
+
+  if (!response.ok) {
+    throw new Error(payload.error || '请求失败');
+  }
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(`接口 ${url} 没有返回 JSON。请确认 Cloudflare Pages Functions 已部署，并已绑定 D1 数据库 DB。`);
+  }
+
+  return payload;
 };
 
 async function login() {
@@ -91,4 +102,6 @@ async function loadCellar() {
 document.querySelector('#loginBtn').addEventListener('click', login);
 document.querySelector('#refreshCellar').addEventListener('click', loadCellar);
 loadProducts().catch((error) => alert(error.message));
-loadCellar().catch(() => {});
+loadCellar().catch((error) => {
+  document.querySelector('#cellar').innerHTML = `<p class="muted">${error.message}</p>`;
+});

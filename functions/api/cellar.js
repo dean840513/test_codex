@@ -1,7 +1,8 @@
-import { centsToYuan, getDemoUser, json, requireDb } from './_shared.js';
+import { centsToYuan, getDemoUser, json, missingDbResponse, requireDb } from './_shared.js';
 
 export async function onRequestGet({ env }) {
   const db = requireDb(env);
+  if (!db) return missingDbResponse();
   const user = await getDemoUser(db);
   const { results } = await db.prepare(`
     SELECT c.id, c.quantity, c.created_at, p.id AS product_id, p.name, p.producer, p.vintage, p.price_cents, p.image_url
